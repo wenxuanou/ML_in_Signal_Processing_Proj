@@ -1,5 +1,7 @@
 from typing import Dict
 
+import l5kit
+
 from tempfile import gettempdir
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,3 +27,7 @@ import os
 
 from collections import Counter
 from l5kit.data import PERCEPTION_LABELS
+
+import l5kit.data
+
+semanticMapPath = "E:\\lyftUncompressed\\semantic_map"
