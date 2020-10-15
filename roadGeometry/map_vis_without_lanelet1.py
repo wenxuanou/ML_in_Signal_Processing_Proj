@@ -96,6 +96,8 @@ def draw_map_without_lanelet(filename, axes, lat_origin, lon_origin):
 
     unknown_linestring_types = list()
 
+    xRoad, yRoad = list(), list()
+
     for way in e.findall('way'):
         way_type = get_type(way)
         if way_type is None:
@@ -118,8 +120,8 @@ def draw_map_without_lanelet(filename, axes, lat_origin, lon_origin):
             type_dict = dict(color="white", linewidth=1, zorder=10, dashes=[5, 10])
         elif way_type == "bike_marking":
             type_dict = dict(color="white", linewidth=1, zorder=10, dashes=[5, 10])
-        elif way_type == "stop_line":
-            type_dict = dict(color="white", linewidth=3, zorder=10)
+        #elif way_type == "stop_line":
+            #type_dict = dict(color="white", linewidth=3, zorder=10)
         elif way_type == "virtual":
             type_dict = dict(color="blue", linewidth=1, zorder=10, dashes=[2, 5])
         elif way_type == "road_border":
@@ -136,7 +138,11 @@ def draw_map_without_lanelet(filename, axes, lat_origin, lon_origin):
         x_list, y_list = get_x_y_lists(way, point_dict)
         plt.plot(x_list, y_list, **type_dict)
 
-        print(len(x_list), len(y_list))
+        for i, xPoint in enumerate(x_list):
+            xRoad.append(xPoint)
+            yRoad.append(y_list[i])
 
     if len(unknown_linestring_types) != 0:
         print("Found the following unknown types, did not plot them: " + str(unknown_linestring_types))
+
+    return xRoad, yRoad
