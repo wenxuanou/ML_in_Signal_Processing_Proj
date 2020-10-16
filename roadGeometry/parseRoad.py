@@ -23,7 +23,7 @@ for args_scenario_name in scenarios:
 	outputCSV = os.path.join(outputFolder, args_scenario_name + ".csv")
 
 	fig, axes = plt.subplots(1, 1)
-	xRoad, yRoad = map_vis_without_lanelet1.draw_map_without_lanelet(lanelet_map_file, axes, lat_origin, lon_origin)
+	xRoad, yRoad, wayGroup, nodeID = map_vis_without_lanelet1.draw_map_without_lanelet(lanelet_map_file, axes, lat_origin, lon_origin)
 	
-	df = pd.DataFrame({"x": xRoad, "y": yRoad})
+	df = pd.DataFrame({"x": xRoad, "y": yRoad, "way": wayGroup, "nodeID": nodeID})
 	df.to_csv(outputCSV, index=False)

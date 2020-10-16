@@ -96,9 +96,9 @@ def draw_map_without_lanelet(filename, axes, lat_origin, lon_origin):
 
     unknown_linestring_types = list()
 
-    xRoad, yRoad = list(), list()
+    xRoad, yRoad, wayGroup, nodeID = list(), list(), list(), list()
 
-    for way in e.findall('way'):
+    for w, way in enumerate(e.findall('way')):
         way_type = get_type(way)
         if way_type is None:
             raise RuntimeError("Linestring type must be specified")
@@ -141,8 +141,10 @@ def draw_map_without_lanelet(filename, axes, lat_origin, lon_origin):
         for i, xPoint in enumerate(x_list):
             xRoad.append(xPoint)
             yRoad.append(y_list[i])
+            wayGroup.append(w)
+            nodeID.append(i)
 
     if len(unknown_linestring_types) != 0:
         print("Found the following unknown types, did not plot them: " + str(unknown_linestring_types))
 
-    return xRoad, yRoad
+    return xRoad, yRoad, wayGroup, nodeID
