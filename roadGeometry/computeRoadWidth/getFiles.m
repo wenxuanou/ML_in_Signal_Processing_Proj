@@ -30,7 +30,7 @@ for i = 1:length(scenarios)
     end
 end
 
-inputFiles.files = inputFiles_;
-inputFiles.scenarios = scenariosFull;
-inputFiles.trainVal = trainVal;
+inputFiles.file = inputFiles_;
+inputFiles.scenario = scenariosFull;
+inputFiles.trainValFolder = trainVal;
 end
