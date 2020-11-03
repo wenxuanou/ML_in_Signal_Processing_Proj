@@ -9,6 +9,13 @@ roadLanesFolder = "D:\CMUclasses\18797\project\customDataset\roadsLanes";
 [inputFiles, scenarios] = getFiles(interactionDatasetFolder, scenariosFolder);
 %createFolders(outputFolder, scenarios);
 
-for i = 1:length(scenarios)
-    roadCSVfilename = fullfile(roadLanesFolder, strcat(scenarios(i), ".csv"));
-end
+tic;
+i = 62;
+%for i = 1:size(inputFiles, 1)
+    roadLanesCSVfilename = fullfile(roadLanesFolder, strcat(inputFiles.scenario(i), ".csv"));
+    roadLanesTable = readtable(roadLanesCSVfilename);
+    interactionTable = readtable(inputFiles.file(i));
+    
+    interactionLanesTable = addLanesColumns(interactionTable, roadLanesTable, KnearestLanes);
+%end
+toc;
