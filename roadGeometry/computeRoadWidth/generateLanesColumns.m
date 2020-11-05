@@ -1,4 +1,4 @@
-function interactionLanesTable = addLanesColumns(interactionTable, roadLanesTable, KnearestLanes)
+function interactionLanesTable = generateLanesColumns(interactionTable, roadLanesTable, KnearestLanes)
 lanesArrayAll = zeros(size(interactionTable, 1), KnearestLanes * 2);
 for i = 1:size(interactionTable, 1)
     Cx = interactionTable.x(i); Cy = interactionTable.y(i);
@@ -21,8 +21,7 @@ for i = 1:size(interactionTable, 1)
     lanesArrayAll(i, :) = reshape(reshape2Darray', 1, KnearestLanes * 2);
 end
 
-%Not this! Change this to include header and return proper table with Dx
-%and Dy.
-interactionLanesTable = lanesArrayAll;
+tableHeaders = reshape(["laneX", "laneY"]' + (1:KnearestLanes), 1, 2 * KnearestLanes);
+interactionLanesTable = array2table(lanesArrayAll, 'VariableNames', cellstr(tableHeaders));
 
 end

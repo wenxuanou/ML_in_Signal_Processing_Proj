@@ -7,15 +7,18 @@ outputFolder = "D:\CMUclasses\18797\project\customDataset\orthogonalIntersection
 roadLanesFolder = "D:\CMUclasses\18797\project\customDataset\roadsLanes";
 
 [inputFiles, scenarios] = getFiles(interactionDatasetFolder, scenariosFolder);
-%createFolders(outputFolder, scenarios);
+createFolders(outputFolder, scenarios);
 
 tic;
-i = 62;
-%for i = 1:size(inputFiles, 1)
+for i = 1:size(inputFiles, 1)
+    display(i);
     roadLanesCSVfilename = fullfile(roadLanesFolder, strcat(inputFiles.scenario(i), ".csv"));
     roadLanesTable = readtable(roadLanesCSVfilename);
     interactionTable = readtable(inputFiles.file(i));
     
-    interactionLanesTable = addLanesColumns(interactionTable, roadLanesTable, KnearestLanes);
-%end
+    interactionLanesTable = generateLanesColumns(interactionTable, roadLanesTable, KnearestLanes);
+    [~, outputCSVfilename] = fileparts(inputFiles.file(i));
+    outputCSVpath = fullfile(outputFolder, inputFiles.scenario(i), inputFiles.trainValFolder(i), strcat(outputCSVfilename, ".csv"));
+    writetable([interactionTable interactionLanesTable], outputCSVpath);
+end
 toc;
