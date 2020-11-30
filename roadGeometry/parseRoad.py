@@ -9,7 +9,7 @@ import map_vis_without_lanelet1
 import pandas as pd
 
 maps_dir = "D:\\CMUclasses\\18797\\project\\interactionDataset\\INTERACTION-Dataset-DR-v1_1\\maps"
-outputFolder = "D:\\CMUclasses\\18797\\project\\customDataset\\roadCSV"
+outputFolder = "D:\\CMUclasses\\18797\\project\\customDataset\\roadsNodes"
 scenariosFolder = "D:\\CMUclasses\\18797\\project\\interactionDataset\\INTERACTION-Dataset-DR-v1_1\\recorded_trackfiles"
 
 lat_origin = 0.  # origin is necessary to correctly project the lat lon values in the osm file to the local
