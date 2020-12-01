@@ -3,6 +3,7 @@ clear all;
 clc;
 
 %% get the vehicle track
+% path to the dataset
 dataName = "../INTERACTION-Dataset-DR-v1_1/recorded_trackfiles/DR_DEU_Merging_MT/vehicle_tracks_000.csv";
 data = readtable(dataName);
 
@@ -21,7 +22,7 @@ StateExpectedMatrix = [track.x, track.y, track.vx, track.vy];   % [x, y, vx, vy]
 
 % timelapse between frames
 deltaT = 0.1;   % 100 ms, assume fixed
-% constant noise variance
+% constant noise variance, avoid zero kalman gain
 theta_epsilon = 0.0001;
 theta_gamma = 0.0001;
 
@@ -62,6 +63,7 @@ hold on
 plot(outTrack(:,1),outTrack(:,2))
 
 err = immse(outTrack,[track.x,track.y]);
+disp("MSE:")
 disp(err)
 
 
