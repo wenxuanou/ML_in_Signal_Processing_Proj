@@ -19,6 +19,9 @@ road(scenario, roadCenters, 'Lanes', laneSpecification);
 ego_kf = vehicle(scenario, ...
     'ClassID', 1, ...
     'Position', [56 19 0]);
+
+% I want us to generate this by calling KF
+% How to do this?
 waypoints = [56 19 0;
     135 19 0];
 speed = 10;
