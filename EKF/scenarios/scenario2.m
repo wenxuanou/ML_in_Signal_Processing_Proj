@@ -26,7 +26,9 @@ muE = zeros(1, 6); muGamma = zeros(1, 6);
 varE = eye(6); varGamma = eye(6);
 
 sEstimated = KF(sInit, Nobservations, o, muE, muGamma, varE, varGamma, A, B, R);
-stateIndex = 6;
+
+%Subplot
+stateIndex = 1;
 scatter(t, o(stateIndex,:))
 hold on
 scatter(t, sEstimated(stateIndex, :))

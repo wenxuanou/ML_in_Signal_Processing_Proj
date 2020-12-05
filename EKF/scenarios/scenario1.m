@@ -16,7 +16,7 @@ muE = zeros(1, 3); muGamma = zeros(1, 3);
 varE = eye(3); varGamma = eye(3);
 sEstimated = KF(sInit, Nobservations, o, muE, muGamma, varE, varGamma, A, B, R);
 
-stateIndex = 2;
+stateIndex = 1;
 scatter(t, o(stateIndex,:))
 hold on
 scatter(t, sEstimated(stateIndex, :))
