@@ -7,7 +7,7 @@ t1 = 0:(N - 1); t2 = 0:(N - 1);
 a = [a1 a2];
 [a, v, x] = stateGenerator1D(a, deltaT);
 sOriginal = [x; v; a]; t = [t1 t2 + N];
-B = eye(3); A = [1 deltaT (deltaT^2)/2; 0 1 deltaT; 0 0 1]; R = zeros(size(A)); I = eye(3);
+B = eye(3); A = [1 deltaT (deltaT^2)/2; 0 1 deltaT; 0 0 1]; R = zeros(size(A));
 
 Nobservations = 2 * N;
 o = B * sOriginal + normrnd(0, 1, size(R, 1), Nobservations);
