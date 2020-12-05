@@ -13,5 +13,10 @@ ax = [ax1 ax2 ax3]; ay = [ay1 ay2 ay3 ay4 ay5 ay6];
 [ay, vy, y] = stateGenerator1D(ay, deltaT);
 
 sOriginal = [x; y; vx; vy; ax; ay];
-A = [1 1 1 1 0.5 0.5; 0 0 1 1 1 1; 0 0 0 0 1 1];
+A = [1 1 deltaT deltaT (deltaT^2)/2 (deltaT^2)/2;
+    1 1 deltaT deltaT (deltaT^2)/2 (deltaT^2)/2;
+    0 0 1 1 deltaT deltaT;
+    0 0 1 1 deltaT deltaT;
+    0 0 0 0 1 1;
+    0 0 0 0 1 1];
 
