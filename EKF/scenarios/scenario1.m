@@ -19,8 +19,8 @@ muE = zeros(1, 3); muGamma = zeros(1, 3);
 varE = eye(3); varGamma = eye(3);
 sEstimated = KF(sInit, Nobservations, o, muE, muGamma, varE, varGamma, A, B, R);
 
-scatter(t, o(1,:))
+scatter(t, o(3,:))
 hold on
-scatter(t, sEstimated(1, :))
+scatter(t, sEstimated(3, :))
 legend('observation', 'prediction')
 hold off
