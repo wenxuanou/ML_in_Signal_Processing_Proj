@@ -1,19 +1,23 @@
 function s = KF(sInit, N, o, muE, muGamma, varE, varGamma, Ainit, Binit, Rinit)
-    A = Ainit; B = Binit; R = Rinit;
-    I = eye(size(A)); sHat = sInit;
+    A = Ainit;
+    B = Binit; 
+    R = Rinit;
     s = zeros(size(sInit, 1), N);
+    s(:, 1) = sInit; 
     
-    for i = 1:N
-        %Predict
-        sT = A * sHat + muE';
-        R = varE + A * R * A';
-
-        %Update
-        K = R * B' * inv(B * R * B' + varGamma);
-        sHat = sT + K * (o(:, i) - B * sT - muGamma');
-        R = (I - K * B) * R;
-        
-        s(:, i) = sT;
-    end
+     for i = 1:N
+         
+         % What is the previous state?
+         prev  = 1;
+         if i > 1
+             prev = i - 1;
+         end
+         
+         % Estimate the state for a given observation and confidence level
+         [estS, R ]= estimate(s(:, prev), o(:, i), muE, muGamma, varE, varGamma, A, B, R);
+         
+         s(:, i) = estS;
+    
+     end
 
 end
