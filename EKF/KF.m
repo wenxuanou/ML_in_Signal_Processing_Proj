@@ -5,7 +5,7 @@ function s = KF(sInit, N, o, muE, muGamma, varE, varGamma, Ainit, Binit, Rinit)
     s = zeros(size(sInit, 1), N);
     s(:, 1) = sInit; 
     
-     for i = 1:N
+     for i = 1:N     % iterate all observations
          
          % What is the previous state?
          prev  = 1;

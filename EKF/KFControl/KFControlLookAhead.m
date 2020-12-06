@@ -1,4 +1,4 @@
-function s = lookAhead(sInit, N, o, muE, muGamma, varE, varGamma, Ainit, Binit, Rinit)
+function s = KFControlLookAhead(sInit, N, o, muE, muGamma, varE, varGamma, Ainit, Binit, Rinit)
     % This function looks forward N steps, from a specic observation and state.
 
     A = Ainit;  % state transition matrix
