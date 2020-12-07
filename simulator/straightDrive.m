@@ -29,4 +29,5 @@ function [] = straightDrive(roadLength, carSpeed, carPositions)
         pause(0.01)
     end
 
+    drivingScenarioDesigner(scenario)
 end
