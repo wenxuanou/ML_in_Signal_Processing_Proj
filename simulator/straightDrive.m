@@ -3,23 +3,23 @@
 % obstacle.
 %
 % parameters:
-% road_legth (some numbers), car_speed (m/s), car_positions(2 dimension * N )
+% roadLegth (some numbers), carSpeed (m/s), carPositions(Array of x, y)
 % Usage: straightDrive(50, 20, [0 2; 25 2 ])
 
-function [] = straightDrive(road_length, car_speed, car_positions)
+function [] = straightDrive(roadLength, carSpeed, carPositions)
 
     % A driving scenario
     scenario = drivingScenario;
 
     % Adding a 2 lanes road starting from 0 to road_leghth
-    roadCenters = [0 0; road_length 0];
+    roadCenters = [0 0; roadLength 0];
     road(scenario,roadCenters,'Lanes',lanespec(2));
 
     % A car
-    v = vehicle(scenario,'ClassID',1);
+    car = vehicle(scenario,'ClassID',1);
 
     % Making a trajectory
-    trajectory(v,car_positions,car_speed)
+    trajectory(car,carPositions,carSpeed)
 
     % Plot the scenario and advance the vehicle
     plot(scenario)
