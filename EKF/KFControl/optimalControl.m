@@ -12,7 +12,8 @@ function u_opt = optimalControl(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, 
             estS = si;
             o_pred = oi;
             cost = 0;
-            for iter = 1:4
+            for iter = 1:2
+            %for iter = 1:4
                 [estS,R]= KFControlEstimate(estS, o_pred, muE, muGamma, varE, varGamma, A, B, R, G, u);
                 o_pred = B * estS + normrnd(0, 1, size(oi));   % Number of state variable * 1
                 
