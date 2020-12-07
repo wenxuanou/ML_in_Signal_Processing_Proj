@@ -47,9 +47,9 @@ s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit
 %scatter(obstacleX, obstacleY)
 %ylim([10 30])
 
-positions = s(1:2, 1: end)';
+positions = s(1:2, 1:end)';
 
-straightDrive(destinationX, 10, positions)
+Prasad(20, positions, obstacleX, obstacleY);
 
 function s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit, obstacleX, obstacleY, destinationX, destinationY)
     s = zeros(size(sInit, 1), N);
