@@ -5,8 +5,8 @@ carInitX = 0;
 carInitY = 15;
 destinationX = 100;
 destinationY = 15;
-obstacleX = 50;
-obstacleY = 15;
+obstacleX = [25, 50, 75]; %[75, 50];
+obstacleY = [15, 20, 15]; %[15, 20];
 
 deltaT = 1;
 N = 100; % Number of time steps
@@ -38,7 +38,6 @@ A = [1 0 deltaT 0 (deltaT^2)/2 0;
 B = eye(6); R = zeros(size(A));
 
 % training kalman filter
-% TODO: find o
 o = B * sInit + normrnd(0, 1, size(sInit));
 s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit, obstacleX, obstacleY, destinationX, destinationY);
 
@@ -46,6 +45,7 @@ figure(1)
 scatter(s(1,:),s(2,:))
 hold on
 scatter(obstacleX, obstacleY)
+ylim([10 30])
 
 function s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit, obstacleX, obstacleY, destinationX, destinationY)
     s = zeros(size(sInit, 1), N);
@@ -86,10 +86,10 @@ function [sHat, R]= KFControlEstimateInline(sPrev, o, muE, muGamma, varE, varGam
 end
 
 function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, u, obstacleX, obstacleY, destinationX, destinationY)
-    ux = 0.7 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
+    ux = 0.5 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
     uy = 0.5 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
 
-    muGaussianCost = 0; sigmaGaussianCost = 1;
+    muGaussianCost = 0; sigmaGaussianCost = 2.5;
     
      minCost = Inf;
     u_opt = u;
@@ -99,7 +99,6 @@ function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B,
            
             estS = si;
             o_pred = oi;
-            cost = 0;
             [estS,R]= KFControlEstimate(estS, o_pred, muE, muGamma, varE, varGamma, A, B, R, G, u);
             o_pred = B * estS;% + normrnd(0, 1, size(oi));   % Number of state variable * 1
 
@@ -109,11 +108,14 @@ function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B,
                 %sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2) +... 
                 %1/(sqrt((o_pred(1) - obstacleX)^2 + (o_pred(2) - obstacleY)^2));
             
-            cost = cost + ...
-                sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2) + ...
-                ((normpdf(o_pred(1) - obstacleX, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
-                (normpdf(o_pred(2) - obstacleY, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
-                
+            cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2);
+            for obstacleI = 1:size(obstacleX, 2)
+                obstacleXi = obstacleX(obstacleI); obstacleYi = obstacleY(obstacleI);
+                cost = cost + ...
+                ((normpdf(o_pred(1) - obstacleXi, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
+                (normpdf(o_pred(2) - obstacleYi, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
+            end
+            
             if cost < minCost
                 u_opt = u;
                 minCost = cost;
