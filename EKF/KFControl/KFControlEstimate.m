@@ -7,6 +7,7 @@ function [sHat, R]= KFControlEstimate(sPrev, o, muE, muGamma, varE, varGamma, A,
     sHat = sPrev;
     
     %Predict
+    % sT: [x;y;vx;vy;ax;ay], 6*1
     sT = A * sHat + G * u + muE';   % st[N*1] = At[N*N] * st-1[N*1] + G[N*2] * u[2*1] + epsilon
     R = varE + A * R * A';
 
