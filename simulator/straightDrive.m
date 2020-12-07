@@ -12,7 +12,7 @@ function [] = straightDrive(roadLength, carSpeed, carPositions)
     scenario = drivingScenario;
 
     % Adding a 2 lanes road starting from 0 to road_leghth
-    roadCenters = [0 0; roadLength 0];
+    roadCenters = [0 17; roadLength 17];
     road(scenario,roadCenters,'Lanes',lanespec(2));
 
     % A car
