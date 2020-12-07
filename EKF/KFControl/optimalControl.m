@@ -1,4 +1,4 @@
-function u_opt = optimalControl(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, u, obsticalX, obsticalY, destinationX, destinationY)
+function u_opt = optimalControl(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, u, obstacleX, obstacleY, destinationX, destinationY)
     % delAx = 0 or 1 or -1     increase or decrease in acceleration
     % delAy = 0 or 1 or -1
     
@@ -21,7 +21,7 @@ function u_opt = optimalControl(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, 
                 % accumulate cost alone the look ahead states
                 cost = cost +...
                     sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2) +... 
-                    1/(sqrt((o_pred(1) - obsticalX)^2 + (o_pred(2) - obsticalY)^2));
+                    1/(sqrt((o_pred(1) - obstacleX)^2 + (o_pred(2) - obstacleY)^2));
                 
 %                 disp(cost)
             end
