@@ -9,10 +9,11 @@ carInitX = 0;
 carInitY = 15;
 destinationX = 100;
 destinationY = 15;
-obstacleX = [30, 30, 60, 60]; %[75, 50];
-obstacleY = [15, 13, 27, 24]; %[15, 20];
-ObstaclecarX = 1:100;
-ObstaclecarY = 20;
+obstacleX = [0]; %[75, 50];
+obstacleY = [0]; %[15, 20];
+
+ObstaclecarX1 = 110:-1:10;  % need 100 points, match to condition in optimalControl2Inline
+ObstaclecarY1 = 20 * ones(size(ObstaclecarX1));
 
 deltaT = 1;
 N = 100; % Number of time steps
@@ -48,7 +49,7 @@ B = eye(6); R = zeros(size(A));
 % training kalman filter
 o = B * sInit + normrnd(0, 1, size(sInit));
 s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit,...
-    obstacleX, obstacleY, ObstaclecarX, ObstaclecarY, destinationX, destinationY);
+    obstacleX, obstacleY, ObstaclecarX1, ObstaclecarY1, destinationX, destinationY);
 
 figure(1)
 scatter(s(1,:),s(2,:))
@@ -58,7 +59,7 @@ ylim([10 30])
 
 positions = s(1:2, 1:end)';
 
-Prasad(20, positions, obstacleX, obstacleY, ObstaclecarX, ObstaclecarY);
+Prasad(20, positions, obstacleX, obstacleY, ObstaclecarX1, ObstaclecarY1);
 
 function s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit,...
     obstacleX, obstacleY, ObstaclecarX, ObstaclecarY, destinationX, destinationY)
@@ -108,8 +109,9 @@ function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B,
     ux = 0.75 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
     uy =  0.75 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
     
-    muGaussianCost = 0; sigmaGaussianCost = 2.5; penalty = 10;
-    roadBoundary1 = 10; roadBoundary2 = 30; roadPenalty = 20; roadsigmaCost = 1.5;
+    muGaussianCost = 0; sigmaGaussianCost = 2.5; penalty = 10; 
+    carPenalty = 10; carsigmaCost = 1.5;
+    roadBoundary1 = 10; roadBoundary2 = 30; roadPenalty = 20; roadsigmaCost = 1;
     
     minCost = Inf;
     u_opt = u;
@@ -127,14 +129,14 @@ function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B,
                 cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2)+...
                 roadPenalty*(normpdf(o_pred(2) - roadBoundary1, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
                 roadPenalty*(normpdf(o_pred(2) - roadBoundary2, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
-                ((penalty*normpdf(o_pred(1) - carPositionX,muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
-                (penalty*normpdf(o_pred(2) - ObstaclecarY,muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
+                ((carPenalty*normpdf(o_pred(1) - carPositionX,muGaussianCost, carsigmaCost) / normpdf(0, muGaussianCost, carsigmaCost)) * ...
+                (carPenalty*normpdf(o_pred(2) - ObstaclecarY,muGaussianCost, carsigmaCost) / normpdf(0, muGaussianCost, carsigmaCost)));
             else
                 cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2)+...
                 roadPenalty*(normpdf(o_pred(2) - roadBoundary1, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
                 roadPenalty*(normpdf(o_pred(2) - roadBoundary2, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
-                ((penalty*normpdf(o_pred(1) - ObstaclecarX(iteration + j - 1),muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
-                (penalty*normpdf(o_pred(2) - ObstaclecarY,muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
+                ((carPenalty*normpdf(o_pred(1) - ObstaclecarX(iteration + j - 1),muGaussianCost, carsigmaCost) / normpdf(0, muGaussianCost, carsigmaCost)) * ...
+                (carPenalty*normpdf(o_pred(2) - ObstaclecarY(iteration + j - 1),muGaussianCost, carsigmaCost) / normpdf(0, muGaussianCost, carsigmaCost)));
             end
                
             

@@ -1,5 +1,7 @@
 clear; clc;
 
+addpath '/Users/owenou/Documents/MATLAB/cmu/18797 ml in signal processing/ML_in_Signal_Processing_Proj/simulator'
+
 % generate basic senario elements
 carInitX = 0;
 carInitY = 15;
@@ -41,11 +43,11 @@ B = eye(6); R = zeros(size(A));
 o = B * sInit + normrnd(0, 1, size(sInit));
 s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit, obstacleX, obstacleY, destinationX, destinationY);
 
-%figure(1)
-%scatter(s(1,:),s(2,:))
-%hold on
-%scatter(obstacleX, obstacleY)
-%ylim([10 30])
+figure(1)
+scatter(s(1,:),s(2,:))
+hold on
+scatter(obstacleX, obstacleY)
+ylim([10 30])
 
 positions = s(1:2, 1:end)';
 
@@ -93,9 +95,9 @@ function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B,
     ux = 0.5 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
     uy = 0.5 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
 
-    muGaussianCost = 0; sigmaGaussianCost = 2.5;
+    muGaussianCost = 0; sigmaGaussianCost = 3.5;
     
-     minCost = Inf;
+    minCost = Inf;
     u_opt = u;
     for i = 1:size(ux, 1)
         for j = 1:size(ux,2)
