@@ -1,12 +1,16 @@
-clear; clc;
+clear all; 
+close all;
+clc;
+
+addpath '/Users/owenou/Documents/MATLAB/cmu/18797 ml in signal processing/ML_in_Signal_Processing_Proj/simulator'
 
 % generate basic senario elements
 carInitX = 0;
 carInitY = 15;
 destinationX = 100;
 destinationY = 15;
-obstacleX = [10, 25, 50, 75]; %[75, 50];
-obstacleY = [10, 15, 20, 15]; %[15, 20];
+obstacleX = [30, 30, 60, 60]; %[75, 50];
+obstacleY = [15, 13, 27, 24]; %[15, 20];
 
 deltaT = 1;
 N = 100; % Number of time steps
@@ -35,6 +39,8 @@ A = [1 0 deltaT 0 (deltaT^2)/2 0;
     0 0 0 0 1 0;
     0 0 0 0 0 1]; 
 
+
+
 B = eye(6); R = zeros(size(A));
 
 % training kalman filter
@@ -46,6 +52,10 @@ scatter(s(1,:),s(2,:))
 hold on
 scatter(obstacleX, obstacleY)
 ylim([10 30])
+
+positions = s(1:2, 1:end)';
+
+Prasad(20, positions, obstacleX, obstacleY);
 
 function s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit, obstacleX, obstacleY, destinationX, destinationY)
     s = zeros(size(sInit, 1), N);
@@ -86,12 +96,13 @@ function [sHat, R]= KFControlEstimateInline(sPrev, o, muE, muGamma, varE, varGam
 end
 
 function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, u, obstacleX, obstacleY, destinationX, destinationY)
-    ux = 0.5 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
-    uy = 0.5 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
-
-    muGaussianCost = 0; sigmaGaussianCost = 2.5;
+    ux = 0.75 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
+    uy =  0.75 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
     
-     minCost = Inf;
+    muGaussianCost = 0; sigmaGaussianCost = 2.5; penalty = 10;
+    roadBoundary1 = 10; roadBoundary2 = 30; roadPenalty = 20; roadsigmaCost = 1.5;
+    
+    minCost = Inf;
     u_opt = u;
     for i = 1:size(ux, 1)
         for j = 1:size(ux,2)
@@ -101,28 +112,26 @@ function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B,
             o_pred = oi;
             [estS,R]= KFControlEstimate(estS, o_pred, muE, muGamma, varE, varGamma, A, B, R, G, u);
             o_pred = B * estS;% + normrnd(0, 1, size(oi));   % Number of state variable * 1
-
-            % observation:[x,y,vx,vy,ax,ay]
-            % accumulate cost alone the look ahead states
-            %cost = cost +...
-                %sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2) +... 
-                %1/(sqrt((o_pred(1) - obstacleX)^2 + (o_pred(2) - obstacleY)^2));
             
-            cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2);
+            cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2)+...
+                roadPenalty*(normpdf(o_pred(2) - roadBoundary1, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost))+...
+                roadPenalty*(normpdf(o_pred(2) - roadBoundary2, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost));
             for obstacleI = 1:size(obstacleX, 2)
                 obstacleXi = obstacleX(obstacleI); obstacleYi = obstacleY(obstacleI);
                 cost = cost + ...
-                ((normpdf(o_pred(1) - obstacleXi, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
-                (normpdf(o_pred(2) - obstacleYi, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
+                ((penalty*normpdf(o_pred(1) - obstacleXi, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
+                (penalty*normpdf(o_pred(2) - obstacleYi, muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
             end
-            
+
             if cost < minCost
                 u_opt = u;
                 minCost = cost;
             end
-            
+            disp(cost)
+            disp(u)
         end
     end
-    
+    disp('minCost:')
     disp(minCost)
+    disp(u_opt)
 end
