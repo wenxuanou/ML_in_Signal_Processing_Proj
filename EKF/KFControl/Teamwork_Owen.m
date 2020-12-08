@@ -2,7 +2,7 @@ clear all;
 close all;
 clc;
 
-addpath '/Users/owenou/Documents/MATLAB/cmu/18797 ml in signal processing/ML_in_Signal_Processing_Proj/simulator'
+addpath '.../simulator'
 
 % generate basic senario elements
 carInitX = 0;
@@ -11,6 +11,8 @@ destinationX = 100;
 destinationY = 15;
 obstacleX = [30, 30, 60, 60]; %[75, 50];
 obstacleY = [15, 13, 27, 24]; %[15, 20];
+ObstaclecarX = 1:100;
+ObstaclecarY = 20;
 
 deltaT = 1;
 N = 100; % Number of time steps
@@ -45,7 +47,8 @@ B = eye(6); R = zeros(size(A));
 
 % training kalman filter
 o = B * sInit + normrnd(0, 1, size(sInit));
-s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit, obstacleX, obstacleY, destinationX, destinationY);
+s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit,...
+    obstacleX, obstacleY, ObstaclecarX, ObstaclecarY, destinationX, destinationY);
 
 figure(1)
 scatter(s(1,:),s(2,:))
@@ -55,15 +58,19 @@ ylim([10 30])
 
 positions = s(1:2, 1:end)';
 
-Prasad(20, positions, obstacleX, obstacleY);
+Prasad(20, positions, obstacleX, obstacleY, ObstaclecarX, ObstaclecarY);
 
-function s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit, obstacleX, obstacleY, destinationX, destinationY)
+function s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit,...
+    obstacleX, obstacleY, ObstaclecarX, ObstaclecarY, destinationX, destinationY)
+
     s = zeros(size(sInit, 1), N);
     s(:, 1) = sInit; 
 
     u = uInit;
     for i = 2:N % Iterate over all observations
-        u = optimalControl2Inline(s(:, i-1),o,muE, muGamma, varE, varGamma, A, B, R, G, u, obstacleX, obstacleY, destinationX, destinationY);           % predict multiple step for optimal u
+        
+        u = optimalControl2Inline(s(:, i-1),o,muE, muGamma, varE, varGamma, A, B, R, G, u,...
+            obstacleX, obstacleY, ObstaclecarX, ObstaclecarY, destinationX, destinationY, i);           % predict multiple step for optimal u
 
         disp(u)
         % Estimate the state for a given observation and confidence level
@@ -95,7 +102,9 @@ function [sHat, R]= KFControlEstimateInline(sPrev, o, muE, muGamma, varE, varGam
     
 end
 
-function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, u, obstacleX, obstacleY, destinationX, destinationY)
+function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, u,...
+    obstacleX, obstacleY, ObstaclecarX, ObstaclecarY, destinationX, destinationY, iteration)
+
     ux = 0.75 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
     uy =  0.75 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
     
@@ -113,9 +122,23 @@ function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B,
             [estS,R]= KFControlEstimate(estS, o_pred, muE, muGamma, varE, varGamma, A, B, R, G, u);
             o_pred = B * estS;% + normrnd(0, 1, size(oi));   % Number of state variable * 1
             
-            cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2)+...
-                roadPenalty*(normpdf(o_pred(2) - roadBoundary1, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost))+...
-                roadPenalty*(normpdf(o_pred(2) - roadBoundary2, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost));
+            if iteration + j - 1 > 100      % number of time frame
+                carPositionX = ObstaclecarX(end-1);
+                cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2)+...
+                roadPenalty*(normpdf(o_pred(2) - roadBoundary1, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
+                roadPenalty*(normpdf(o_pred(2) - roadBoundary2, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
+                ((penalty*normpdf(o_pred(1) - carPositionX,muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
+                (penalty*normpdf(o_pred(2) - ObstaclecarY,muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
+            else
+                cost = sqrt((o_pred(1) - destinationX)^2 + (o_pred(2) - destinationY)^2)+...
+                roadPenalty*(normpdf(o_pred(2) - roadBoundary1, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
+                roadPenalty*(normpdf(o_pred(2) - roadBoundary2, muGaussianCost, roadsigmaCost) / normpdf(0, muGaussianCost, roadsigmaCost)) + ...
+                ((penalty*normpdf(o_pred(1) - ObstaclecarX(iteration + j - 1),muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)) * ...
+                (penalty*normpdf(o_pred(2) - ObstaclecarY,muGaussianCost, sigmaGaussianCost) / normpdf(0, muGaussianCost, sigmaGaussianCost)));
+            end
+               
+            
+            
             for obstacleI = 1:size(obstacleX, 2)
                 obstacleXi = obstacleX(obstacleI); obstacleYi = obstacleY(obstacleI);
                 cost = cost + ...
