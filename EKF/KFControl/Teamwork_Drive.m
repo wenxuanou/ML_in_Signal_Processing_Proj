@@ -10,8 +10,8 @@ carInitX = 0;
 carInitY = 15;
 destinationX = 100;
 destinationY = 15;
-obstacleX = [0]; %[75, 50];
-obstacleY = [0]; %[15, 20];
+obstacleX = [6, 25];
+obstacleY = [10, 30];
 
 ObstaclecarX1 = 110:-2:10;  % need 100 points, match to condition in optimalControl2Inline
 ObstaclecarX1 = [ObstaclecarX1, 10 * ones(1,50)];
@@ -65,7 +65,7 @@ ylim([10 30])
 
 positions = s(1:2, 1:end)';
 
-Prasad2cars(20, positions, obstacleX, obstacleY, ObstaclecarX1, ObstaclecarY1, ObstaclecarX2, ObstaclecarY2);
+Drive(20, positions, obstacleX, obstacleY, ObstaclecarX1, ObstaclecarY1, ObstaclecarX2, ObstaclecarY2);
 
 function s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit,...
     obstacleX, obstacleY, ObstaclecarX1, ObstaclecarY1, ObstaclecarX2, ObstaclecarY2, destinationX, destinationY)
