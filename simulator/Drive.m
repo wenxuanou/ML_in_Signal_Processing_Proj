@@ -30,17 +30,16 @@ function [scenario, egoVehicle] = Drive(speed, positions, obstacleX, obstacleY, 
         'Position', [103.994048300763 13.077549886967 0], ...
         'FrontOverhang', 0.9);
     waypoints = [positionVehicle1 zeros(size(positionVehicle1, 1), 1)];
-    trajectory(egoVehicle, waypoints, speed);
+    trajectory(egoVehicle, waypoints, speed*0.75);
     
     
    % Add the Obstacle vehicle 2
     positionVehicle2 = [ObstaclecarX2; ObstaclecarY2]';
-    egoVehicle = vehicle(scenario, ...
+    v2 = vehicle(scenario, ...
         'ClassID', 1, ...
-        'Position', [103.994048300763 13.077549886967 0], ...
-        'FrontOverhang', 0.9);
+        'Position', [103.994048300763 13.077549886967 0]);
     waypoints = [positionVehicle2 zeros(size(positionVehicle2, 1), 1)];
-    trajectory(egoVehicle, waypoints, speed);
+    trajectory(v2, waypoints, speed*.8);
     
     
     % Add the non-ego actors

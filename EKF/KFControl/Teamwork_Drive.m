@@ -6,20 +6,21 @@ clc;
 addpath '../simulator'
 
 % generate basic senario elements
-carInitX = 0;
-carInitY = 15;
-destinationX = 100;
-destinationY = 15;
-obstacleX = [6, 25];
-obstacleY = [10, 30];
+carInitX = 110;
+carInitY = 20;
+destinationX = 0;
+destinationY = 20;
+obstacleX = [40, 40, 40, 40,  80, 80, 80, 80, 80];
+obstacleY = [ 10, 11, 12, 13, 30, 29, 28, 27, 26];
 
-ObstaclecarX1 = 110:-2:10;  % need 100 points, match to condition in optimalControl2Inline
+ObstaclecarX1 = 110:-2:5;  % need 100 points, match to condition in optimalControl2Inline
 ObstaclecarX1 = [ObstaclecarX1, 10 * ones(1,50)];
-ObstaclecarY1 = 20 * ones(size(ObstaclecarX1));
-
+ObstaclecarY1 = 24ch * ones(size(ObstaclecarX1));
+ 
 ObstaclecarX2 = 10:0.5:100;  % need 100 points, match to condition in optimalControl2Inline
 ObstaclecarX2 = [ObstaclecarX2, 105*ones(1,20)];
-ObstaclecarY2 = 15 * ones(size(ObstaclecarX2));
+ObstaclecarY2 = 17 * ones(size(ObstaclecarX2));
+
 
 deltaT = 1;
 N = 100; % Number of time steps
@@ -57,11 +58,11 @@ o = B * sInit + normrnd(0, 1, size(sInit));
 s = KFControlInline(sInit, N, o, muE, muGamma, varE, varGamma, A, B, R, G, uInit,...
     obstacleX, obstacleY, ObstaclecarX1, ObstaclecarY1, ObstaclecarX2, ObstaclecarY2, destinationX, destinationY);
 
-figure(1)
-scatter(s(1,:),s(2,:))
-hold on
-scatter(obstacleX, obstacleY)
-ylim([10 30])
+% figure(1)
+% scatter(s(1,:),s(2,:))
+% hold on
+% scatter(obstacleX, obstacleY)
+% ylim([10 30])
 
 positions = s(1:2, 1:end)';
 
@@ -112,8 +113,8 @@ end
 function u_opt = optimalControl2Inline(si,oi,muE, muGamma, varE, varGamma, A, B, R, G, u,...
     obstacleX, obstacleY, ObstaclecarX1, ObstaclecarY1, ObstaclecarX2, ObstaclecarY2, destinationX, destinationY, iteration)
 
-    ux = 0.75 * [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
-    uy =  0.75 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
+    ux = 1* [0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1; 0 0 0 0];
+    uy =  0.5 * [0 0 0 0; 0 0 0 0; 1 1 1 1; 0 0 0 0; -1 -1 -1 -1; 0 0 0 0; 1 1 -1 -1; 0 0 0 0; -1 -1 1 1];
     
     muGaussianCost = 0; sigmaGaussianCost = 2.5; penalty = 10; 
     carPenalty = 10; carsigmaCost = 1.5;
